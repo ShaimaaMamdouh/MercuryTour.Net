@@ -9,8 +9,6 @@ namespace MercuryTour.Net
 {
     class CloseBrowser
     {
-        readonly TC1_FlightReservation ReportTest = new TC1_FlightReservation();
-
         public void Close()
         {
             try

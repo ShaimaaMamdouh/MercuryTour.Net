@@ -1,7 +1,9 @@
 ﻿using AventStack.ExtentReports;
+using AventStack.ExtentReports.Model;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using RazorEngine.Compilation.ImpromptuInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,24 +29,32 @@ namespace MercuryTour.Net
 		
 		public void CheckSucessLogin()
 		{
-
-			String sucessMsg = LaunchBrowser.driver.FindElement(By.TagName("h3")).Text;
-
-
-
-			if (sucessMsg.Equals("Login Successfully"))
+			try
 			{
-				TC1_FlightReservation.test.Log(Status.Pass, "User Logged in successfully");
-				// test with screenShot
-				TC1_FlightReservation.test.Pass("ScreenShot", MediaEntityBuilder.CreateScreenCaptureFromPath("ScreenSHot.png").Build());
-				TC1_FlightReservation.test.Pass("ScreenShot").AddScreenCaptureFromPath("ScreenSHot.png");
+				String sucessMsg = LaunchBrowser.driver.FindElement(By.TagName("h3")).Text;
+				if (sucessMsg.Equals("Login Successfully"))
+				{
+					TC1_FlightReservation.test.Log(Status.Pass, "User Logged in successfully");
+					//adding screenShot to the report
+					ITakesScreenshot screenshotdriver = (ITakesScreenshot)LaunchBrowser.driver;
+					Screenshot screnshot = screenshotdriver.GetScreenshot();
+					screnshot.SaveAsFile(TC1_FlightReservation.ScreenShotsPath + "\\SucessLogin.bmp", ScreenshotImageFormat.Bmp);
+					TC1_FlightReservation.test.AddScreenCaptureFromPath(TC1_FlightReservation.ScreenShotsPath + "\\SucessLogin.bmp");
+				}
 			}
-			else
+			catch
 			{
-				TC1_FlightReservation.test.Log(Status.Fail, "User can't Logged in successfully");
-				// test with screenShot
-				TC1_FlightReservation.test.Pass("ScreenShot", MediaEntityBuilder.CreateScreenCaptureFromPath("ScreenSHot.png").Build());
-				TC1_FlightReservation.test.Pass("ScreenShot").AddScreenCaptureFromPath("ScreenSHot.png");
+				TC1_FlightReservation.test.Log(Status.Fail, "User can't Logged in successfully");				
+				//adding screenShot to the report
+				ITakesScreenshot screenshotdriver = (ITakesScreenshot)LaunchBrowser.driver;
+				Screenshot screnshot = screenshotdriver.GetScreenshot();
+				screnshot.SaveAsFile(TC1_FlightReservation.ScreenShotsPath + "\\FailureLogin.bmp", ScreenshotImageFormat.Bmp);
+				TC1_FlightReservation.test.AddScreenCaptureFromPath(TC1_FlightReservation.ScreenShotsPath + "\\FailureLogin.bmp");
+				TC1_FlightReservation.extent.Flush();
+				LaunchBrowser.driver.Close();
+				LaunchBrowser.driver.Quit();
+				Environment.Exit(1);
+
 			}
 		}
 	}

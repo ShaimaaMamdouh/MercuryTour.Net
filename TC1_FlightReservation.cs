@@ -5,12 +5,14 @@ using Xunit;
 
 namespace MercuryTour.Net
 {
+	//Before Running this project the following folders should be found in C driver as following "C:\Reports\ScreenShots"
 	//Just press start to Run the project :)
-    public class TC1_FlightReservation
+	public class TC1_FlightReservation
 	{
 		public static ExtentReports extent = new ExtentReports();
 		public static ExtentTest test;
 		public static ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter("C:\\Reports\\Report.html");
+		public static string ScreenShotsPath= "C:\\Reports\\ScreenShots";
 
 			public static void Main (String[]args)
 			{
