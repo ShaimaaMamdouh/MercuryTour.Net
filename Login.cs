@@ -10,12 +10,47 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using System.Windows;
+using Amazon.SimpleEmail.Model;
+using Microsoft.Office.Interop.Excel;
+using _Excel = Microsoft.Office.Interop.Excel;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace MercuryTour.Net
 {
 	public class Login
 	{
-		readonly TC1_FlightReservation ReportTest = new TC1_FlightReservation();
+		String path;
+		_Application excel = new _Excel.Application();
+		Workbook wb;
+		Worksheet ws;
+		public void OpenExcel(String ExcelFilepath, int SheetNumber)
+		{
+			wb = excel.Workbooks.Open(ExcelFilepath);
+			ws = excel.Worksheets[SheetNumber];
+		}
+		public string ReadFromExcel(int ExcelColumn, int ExcelRow)
+		{
+			if (ws.Cells[ExcelColumn, ExcelRow].Value2 != null)
+			{
+				return ws.Cells[ExcelColumn, ExcelRow].Value2;
+			}
+			else
+			{
+				return "Empty value";
+			}
+		}
+
+		public void CloseExcel()
+		{
+			wb.Close();
+			excel.Workbooks.Close();
+			excel.Quit();
+			Marshal.ReleaseComObject(ws);
+			Marshal.ReleaseComObject(wb);
+		}
+
 		public void LoginCredentials(String userName, String Password)
 		{
 				//Wait untill submit button is displayed
@@ -59,4 +94,3 @@ namespace MercuryTour.Net
 		}
 	}
 }
-

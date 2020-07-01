@@ -14,7 +14,7 @@ namespace MercuryTour.Net
 		public static ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter("C:\\Reports\\Report.html");
 		public static string ScreenShotsPath= "C:\\Reports\\ScreenShots";
 
-			public static void Main (String[]args)
+			public static void Main ()
 			{
 			
 			extent.AttachReporter(htmlReporter);
@@ -25,7 +25,13 @@ namespace MercuryTour.Net
 				chromeBrowser.TitleCheck();
 
 			Login user = new Login();
-			user.LoginCredentials("Mercury", "Mercury");
+			String ExcelFilepath = "C:\\Reports\\Users.xlsx";
+			int SheetNumber = 1;
+			user.OpenExcel(ExcelFilepath, SheetNumber);
+			String username = user.ReadFromExcel(2, 1);
+			String password= user.ReadFromExcel(2, 2);
+			user.LoginCredentials(username, password);
+			user.CloseExcel();
 			user.CheckSucessLogin();
 
 			FindFlight flight = new FindFlight();
