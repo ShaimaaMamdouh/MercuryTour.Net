@@ -1,4 +1,5 @@
 ﻿using AventStack.ExtentReports;
+using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,16 +10,16 @@ namespace MercuryTour.Net
 {
     class CloseBrowser
     {
-        public void Close()
+        public void Close(IWebDriver driver,ExtentTest test)
         {
             try
             {
-                LaunchBrowser.driver.Close();
-                TC1_FlightReservation.test.Log(Status.Pass, "Browser closed successfully");
+                driver.Close();
+                test.Log(Status.Pass, "Browser closed successfully");
             }
             catch (Exception)
             {
-                TC1_FlightReservation.test.Log(Status.Fail, "Browser wasn't closed successfully :(");
+                test.Log(Status.Fail, "Browser wasn't closed successfully :(");
             }
         }
     }

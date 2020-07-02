@@ -10,9 +10,9 @@ namespace MercuryTour.Net
 {
     public class LaunchBrowser
     {
-        public static IWebDriver driver = new ChromeDriver(); 
+        //public static IWebDriver driver = new ChromeDriver(); 
 
-        public void Launch()
+        public void Launch(IWebDriver driver)
         { 
             driver.Manage().Window.Maximize();
             driver.Manage().Cookies.DeleteAllCookies();
@@ -20,19 +20,19 @@ namespace MercuryTour.Net
         }
 
     
-        public void TitleCheck()
+        public void TitleCheck(IWebDriver driver, ExtentTest test)
         {
             String expectedTitle = "Welcome: Mercury Tours";
             String actualTitle;
             actualTitle = driver.Title;
             if (actualTitle.Equals(expectedTitle))
             {
-                TC1_FlightReservation.test.Log(Status.Pass,"expected Title was found successfully!");
+                test.Log(Status.Pass,"expected Title was found successfully!");
 
             }
             else
             {
-                TC1_FlightReservation.test.Log(Status.Fail, "expected Title wasn't found successfully :(");
+                test.Log(Status.Fail, "expected Title wasn't found successfully :(");
             }
         }
     }
