@@ -16,12 +16,18 @@ using Microsoft.Office.Interop.Excel;
 using _Excel = Microsoft.Office.Interop.Excel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Configuration;
+using AventStack.ExtentReports.Configuration;
+using NLog.Internal;
+using System.Data.Common;
+using FastExpressionCompiler.LightExpression;
+using DryIoc;
 
 namespace MercuryTour.Net
 {
 	public class Login
 	{
-        readonly _Application excel = new _Excel.Application();
+		readonly _Application excel = new _Excel.Application();
 		Workbook wb;
 		Worksheet ws;
 		public void OpenExcel(String ExcelFilepath, int SheetNumber)
@@ -50,6 +56,50 @@ namespace MercuryTour.Net
 			Marshal.ReleaseComObject(wb);
 		}
 
+		DbCommand command;
+		//connection;
+		DbProviderFactory factory;
+		String connectionString;
+		public void ConnectToDB()
+		{
+			String provider = System.Configuration.ConfigurationManager.AppSettings
+		   ["provider"];
+			connectionString = System.Configuration.ConfigurationManager.AppSettings["connectionString"];
+			factory = DbProviderFactories.GetFactory(provider);
+		}
+		String SelectedData;
+		public String ReturnDataFromDB(int RecordID, string DBCoulmnName)
+		{
+			ConnectToDB();
+			using (DbConnection connection = factory.CreateConnection())
+			{
+				try 
+				{
+					//Console.WriteLine("inside Connecting");
+					//Console.ReadLine();
+					connection.ConnectionString = connectionString;
+					connection.Open();
+
+					 command = factory.CreateCommand();
+					command.Connection = connection;
+					command.CommandText = "select * from Login where ID="+RecordID;
+					using (DbDataReader datareader = command.ExecuteReader())
+					{
+						datareader.Read();
+						SelectedData = datareader[DBCoulmnName].ToString();
+						//Console.WriteLine(SelectedData);
+						return SelectedData;
+
+					}
+				}
+				catch(Exception e)
+                {
+					return SelectedData;
+				}
+			}
+		}
+		
+
 		public void LoginCredentials(String userName, String Password, IWebDriver driver)
 		{
 				//Wait untill submit button is displayed
@@ -61,7 +111,7 @@ namespace MercuryTour.Net
 				driver.FindElement(By.Name("submit")).Click();
 		}
 		
-		public void CheckSucessLogin(IWebDriver driver, ExtentTest test, String ScreenShotsPath)
+		public void CheckSucessLogin(IWebDriver driver, ExtentTest test, String ScreenShotsPath, String TCNumber)
 		{
 			try
 			{
@@ -72,8 +122,8 @@ namespace MercuryTour.Net
 					//adding screenShot to the report
 					ITakesScreenshot screenshotdriver = (ITakesScreenshot)driver;
 					Screenshot screnshot = screenshotdriver.GetScreenshot();
-					screnshot.SaveAsFile(ScreenShotsPath + "\\SucessLogin.bmp", ScreenshotImageFormat.Bmp);
-					test.AddScreenCaptureFromPath(ScreenShotsPath + "\\SucessLogin.bmp");
+					screnshot.SaveAsFile(ScreenShotsPath + "\\SucessLogin"+ TCNumber+".bmp", ScreenshotImageFormat.Bmp);
+					test.AddScreenCaptureFromPath(ScreenShotsPath + "\\SucessLogin"+ TCNumber+".bmp");
 				}
 			}
 			catch
@@ -82,9 +132,8 @@ namespace MercuryTour.Net
 				//adding screenShot to the report
 				ITakesScreenshot screenshotdriver = (ITakesScreenshot)driver;
 				Screenshot screnshot = screenshotdriver.GetScreenshot();
-				screnshot.SaveAsFile(ScreenShotsPath + "\\FailureLogin.bmp", ScreenshotImageFormat.Bmp);
-				test.AddScreenCaptureFromPath(ScreenShotsPath + "\\FailureLogin.bmp");
-				//extent.Flush();
+				screnshot.SaveAsFile(ScreenShotsPath + "\\FailureLogin"+ TCNumber+".bmp", ScreenshotImageFormat.Bmp);
+				test.AddScreenCaptureFromPath(ScreenShotsPath + "\\FailureLogin"+ TCNumber+".bmp");
 				driver.Close();
 				driver.Quit();
 				Environment.Exit(1);

@@ -5,17 +5,20 @@ using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
+using System.Data.SqlClient;
 using Xunit;
+using System.Data.Common;
+
 
 namespace MercuryTour.Net
 {
 	//Before Running this project the following folders should be found in C driver as following "C:\Reports\ScreenShots"
 	//Just press start to Run the project :)
-	public class TC1_FlightReservation
+	public class Tc2_FlightReservation_DBConeection
 	{
 		private static ExtentReports extent;
 		private static ExtentTest test;
-		private static ExtentHtmlReporter htmlReporter;
+		private static ExtentHtmlReporter htmlReporterTC2;
 		private static string ScreenShotsPath;
 		private static IWebDriver driver;
 
@@ -23,35 +26,32 @@ namespace MercuryTour.Net
 		public void Setup()
 		{
 			extent = new ExtentReports();
-			htmlReporter = new ExtentHtmlReporter("C:\\Reports\\Report.html");
+			htmlReporterTC2 = new ExtentHtmlReporter("C:\\Reports\\Report"+"TC2"+".html");
 			ScreenShotsPath = "C:\\Reports\\ScreenShots";
 			driver = new ChromeDriver();
-			extent.AttachReporter(htmlReporter);
-			test = extent.CreateTest("TC1_Flightreservation", "Status report for TC1_Flightreservation");
+			extent.AttachReporter(htmlReporterTC2);
+			test = extent.CreateTest("TC2_Flightreservation using LoginData from SQL DB", "Status report for TC2_Flightreservation");
 
 			LaunchBrowser chromeBrowser = new LaunchBrowser();
 
 			chromeBrowser.Launch(driver);
 			chromeBrowser.TitleCheck(driver, test);
 		}
-
 		[Test]
-		public void TC1_FlightReservation001()
+		public void TC2_FlightReservation002()
 		{
 			Login user = new Login();
-			String ExcelFilepath = "C:\\Reports\\Users.xlsx";
-			int SheetNumber = 1;
-			user.OpenExcel(ExcelFilepath, SheetNumber);
-			String username = user.ReadFromExcel(2, 1);
-			String password = user.ReadFromExcel(2, 2);
-			user.LoginCredentials(username, password,driver);
-			user.CloseExcel();
-			user.CheckSucessLogin(driver, test, ScreenShotsPath);
+			String username = "";
+			String password = "";
+			username = user.ReturnDataFromDB(1, "UserName");
+			password = user.ReturnDataFromDB(1, "password");
+			user.LoginCredentials(username, password, driver);
+			user.CheckSucessLogin(driver, test, ScreenShotsPath,"TC2");
 
 			FindFlight flight = new FindFlight();
-			flight.ClickOnFlightsLinks(driver,test);
-		}
+			flight.ClickOnFlightsLinks(driver, test);
 
+		}
 		[TearDown]
 		public void ClosingApp()
 		{
@@ -63,5 +63,4 @@ namespace MercuryTour.Net
 		}
 	}
 }
-
 
